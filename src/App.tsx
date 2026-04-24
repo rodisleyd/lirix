@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Music2, Mic2, Sparkles, Layers, Info, Sun, Moon } from 'lucide-react';
 import LyricsForm from './components/LyricsForm';
 import LyricsDisplay from './components/LyricsDisplay';
+import TermsModal from './components/TermsModal';
 import { generateLyrics } from './services/geminiService';
 import { LyricRequest, LyricResult } from './types';
 
@@ -25,6 +26,7 @@ export default function App() {
     const saved = localStorage.getItem('lirix_history');
     return saved ? JSON.parse(saved) : [];
   });
+  const [isTermsOpen, setIsTermsOpen] = React.useState(false);
 
   React.useEffect(() => {
     document.documentElement.classList.toggle('light', !isDarkMode);
@@ -332,12 +334,17 @@ export default function App() {
           <span className="hidden md:inline">Powered by Google Gemini 3.1 Pro</span>
         </div>
         <div className="flex items-center gap-6">
-           <div className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors cursor-help group">
+           <button 
+             onClick={() => setIsTermsOpen(true)}
+             className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group cursor-pointer"
+           >
               <Info className="w-4 h-4" />
               <span className="text-[10px] uppercase font-mono tracking-widest">Termos e Privacidade</span>
-           </div>
+           </button>
         </div>
       </footer>
+
+      <TermsModal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
     </div>
   );
 }
