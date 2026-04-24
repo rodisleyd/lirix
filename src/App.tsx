@@ -226,6 +226,8 @@ export default function App() {
                     <LyricsForm.Advanced 
                       formData={formData} 
                       setFormData={setFormData} 
+                      onSubmit={handleGenerate}
+                      isLoading={isLoading}
                     />
                  </div>
               </section>

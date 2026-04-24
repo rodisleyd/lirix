@@ -127,7 +127,7 @@ export default function LyricsForm({ formData, setFormData, onSubmit, isLoading 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form id="lyrics-composition-form" onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-5">
         <div className="group">
           <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
@@ -205,28 +205,16 @@ export default function LyricsForm({ formData, setFormData, onSubmit, isLoading 
           </div>
         </div>
       </div>
-
-      <button
-        disabled={isLoading || !formData.tema || !formData.estilo || formData.estrutura.length === 0}
-        className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-primary/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98] mt-6"
-      >
-        {isLoading ? (
-          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        ) : (
-          <>
-            <Sparkles className="w-5 h-5" />
-            COMPOR AGORA
-          </>
-        )}
-      </button>
     </form>
   );
 }
 
 // Componente para a coluna da direita (Estrutura e Opções Avançadas)
-LyricsForm.Advanced = function({ formData, setFormData }: { 
+LyricsForm.Advanced = function({ formData, setFormData, onSubmit, isLoading }: { 
   formData: LyricRequest, 
-  setFormData: React.Dispatch<React.SetStateAction<LyricRequest>> 
+  setFormData: React.Dispatch<React.SetStateAction<LyricRequest>>,
+  onSubmit?: () => void,
+  isLoading?: boolean
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -374,6 +362,22 @@ LyricsForm.Advanced = function({ formData, setFormData }: {
           </div>
         </div>
       </div>
+
+      <button
+        form="lyrics-composition-form"
+        type="submit"
+        disabled={isLoading || !formData.tema || !formData.estilo || formData.estrutura.length === 0}
+        className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-primary/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98] mt-2"
+      >
+        {isLoading ? (
+          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : (
+          <>
+            <Sparkles className="w-5 h-5" />
+            COMPOR AGORA
+          </>
+        )}
+      </button>
     </div>
   );
 };
