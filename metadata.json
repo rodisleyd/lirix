@@ -1,0 +1,6 @@
+{
+  "name": "Lirix AI - Gerador de Letras",
+  "description": "Um compositor inteligente que ajuda você a criar letras de músicas personalizadas com controle total sobre estrutura, rimas e emoção.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["AI Lyrics Generation"]
+}
