@@ -38,6 +38,7 @@ export default function App() {
   }, [history]);
 
   const [formData, setFormData] = React.useState<LyricRequest>({
+    mode: 'Música',
     tema: '',
     contexto: '',
     referenciaCompositor: '',
@@ -56,7 +57,13 @@ export default function App() {
     palavrasProibidas: '',
     complexidade: 50,
     tomPoetico: 50,
-    modoCantor: false
+    modoCantor: false,
+    marca: '',
+    mensagemPrincipal: '',
+    objetivo: 'Fixar Marca',
+    publicoAlvo: 'Popular',
+    nivelRepeticao: 50,
+    duracaoEstimada: '30s'
   });
 
   React.useEffect(() => {

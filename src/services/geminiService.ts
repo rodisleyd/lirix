@@ -22,7 +22,45 @@ export async function generateLyrics(request: LyricRequest): Promise<LyricResult
     .map((section, index) => `${index + 1}. ${section.type} (${section.lines} linhas)`)
     .join(", ");
 
-  const prompt = `Crie uma letra de música profissional em Português com as seguintes características:
+  const prompt = request.mode === 'Jingle' ? `
+Você é um redator publicitário sênior especializado em Jingles.
+Crie um JINGLE publicitário profissional em Português com as seguintes características:
+
+- Marca/Produto: ${request.marca}
+- Mensagem Principal: ${request.mensagemPrincipal}
+- Objetivo: ${request.objetivo}
+- Público-Alvo: ${request.publicoAlvo}
+- Estilo Musical: ${request.estilo}
+- Duração Estimada: ${request.duracaoEstimada}
+- Nível de Repetição (Chiclete): ${request.nivelRepeticao}% (Onde 100% significa repetição extrema da marca e rimas muito simples)
+
+REGRAS OBRIGATÓRIAS PARA JINGLE:
+1. FRASES CURTAS: No máximo 6 palavras por linha para garantir memorização.
+2. REPETIÇÃO DA MARCA: O nome "${request.marca}" deve aparecer pelo menos 3 vezes no jingle.
+3. ESTRUTURA PUBLICITÁRIA: 
+   - Gancho (Hook) inicial atraente.
+   - Apresentação da Marca.
+   - Benefício principal (Mensagem).
+   - Repetição da marca + Call to Action (Chamada para ação).
+4. SONORIDADE: Use rimas simples e fonemas fáceis de cantar. Evite palavras complexas.
+${request.nivelRepeticao && request.nivelRepeticao > 70 ? '5. MODO CHICLETE ATIVO: Use onomatopeias, aliterações e repita a frase principal múltiplas vezes.' : ''}
+
+${request.audioData ? `
+ATENÇÃO - MODO INSTRUMENTAL ATIVO:
+O usuário enviou um áudio de fundo. Adapte o jingle para caber EXATAMENTE no tempo do áudio.
+Se o áudio for curto (ex: 15s), seja extremamente conciso.
+` : ''}
+
+Formate a resposta como um objeto JSON:
+{
+  "title": "Nome do Jingle",
+  "sections": [
+    { "type": "Intro/Hook", "content": ["..."] },
+    { "type": "Corpo", "content": ["..."] },
+    { "type": "Assinatura/Marca", "content": ["..."] }
+  ]
+}
+` : `Crie uma letra de música profissional em Português com as seguintes características:
 - Tema: ${tema}
 ${contexto ? `- Contexto Adicional: ${contexto}` : ""}
 ${referenciaCompositor ? `- Estilo de Escrita/Referência: Inspirado em ${referenciaCompositor}` : ""}

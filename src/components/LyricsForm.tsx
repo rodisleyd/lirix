@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mic2, Sparkles, ChevronDown, GripVertical, Trash2, Copy, Plus, Upload, Music, X, Sliders, Settings2, Zap } from 'lucide-react';
+import { Mic2, Sparkles, ChevronDown, GripVertical, Trash2, Copy, Plus, Upload, Music, X, Sliders, Settings2, Zap, Target, Users, Timer, Megaphone, Radio } from 'lucide-react';
 import { 
   DndContext, 
   closestCenter,
@@ -128,48 +128,132 @@ export default function LyricsForm({ formData, setFormData, onSubmit, isLoading 
 
   return (
     <form id="lyrics-composition-form" onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-5">
-        <div className="group">
-          <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
-            Título ou Tema Central
-          </label>
-          <input
-            required
-            type="text"
-            placeholder="Ex: Amor de verão, Saudade..."
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all text-sm"
-            value={formData.tema}
-            onChange={e => setFormData({ ...formData, tema: e.target.value })}
-          />
+        {/* Seletor de Modo */}
+        <div className="flex p-1 bg-white/5 rounded-xl border border-white/10 mb-6">
+          {(['Música', 'Jingle'] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setFormData({ ...formData, mode: m })}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                formData.mode === m 
+                  ? 'bg-brand-primary text-white shadow-lg' 
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+            >
+              {m === 'Música' ? <Music className="w-3.5 h-3.5" /> : <Megaphone className="w-3.5 h-3.5" />}
+              {m === 'Música' ? 'Letra de Música' : 'Jingle Builder'}
+            </button>
+          ))}
         </div>
 
-        <div className="group">
-          <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
-            Contexto da Letra
-          </label>
-          <textarea
-            placeholder="Descreva a história ou mensagem..."
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all text-sm h-32 resize-none custom-scrollbar"
-            value={formData.contexto}
-            onChange={e => setFormData({ ...formData, contexto: e.target.value })}
-          />
-        </div>
+        {formData.mode === 'Música' ? (
+          <>
+            <div className="group">
+              <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
+                Título ou Tema Central
+              </label>
+              <input
+                required
+                type="text"
+                placeholder="Ex: Amor de verão, Saudade..."
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all text-sm"
+                value={formData.tema}
+                onChange={e => setFormData({ ...formData, tema: e.target.value })}
+              />
+            </div>
 
-        <div className="group">
-          <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
-            Influência / Artista
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Ex: Caetano Veloso..."
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 pl-10 focus:outline-none focus:border-brand-primary/50 transition-all text-sm"
-              value={formData.referenciaCompositor}
-              onChange={e => setFormData({ ...formData, referenciaCompositor: e.target.value })}
-            />
-            <Mic2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-brand-primary transition-colors" />
-          </div>
-        </div>
+            <div className="group">
+              <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
+                Contexto da Letra
+              </label>
+              <textarea
+                placeholder="Descreva a história ou mensagem..."
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all text-sm h-32 resize-none custom-scrollbar"
+                value={formData.contexto}
+                onChange={e => setFormData({ ...formData, contexto: e.target.value })}
+              />
+            </div>
+
+            <div className="group">
+              <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
+                Influência / Artista
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Ex: Caetano Veloso..."
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 pl-10 focus:outline-none focus:border-brand-primary/50 transition-all text-sm"
+                  value={formData.referenciaCompositor}
+                  onChange={e => setFormData({ ...formData, referenciaCompositor: e.target.value })}
+                />
+                <Mic2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-brand-primary transition-colors" />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="group">
+                <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
+                  Nome da Marca / Produto
+                </label>
+                <div className="relative">
+                  <input
+                    required
+                    type="text"
+                    placeholder="Ex: Padaria Pão Quente..."
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 pl-10 focus:outline-none focus:border-brand-primary/50 transition-all text-sm"
+                    value={formData.marca}
+                    onChange={e => setFormData({ ...formData, marca: e.target.value, tema: `Jingle para ${e.target.value}` })}
+                  />
+                  <Radio className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-brand-primary transition-colors" />
+                </div>
+              </div>
+
+              <div className="group">
+                <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
+                  Mensagem Principal
+                </label>
+                <textarea
+                  placeholder="O que o jingle deve dizer? (Ex: Pão fresquinho toda hora)"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 transition-all text-sm h-24 resize-none custom-scrollbar"
+                  value={formData.mensagemPrincipal}
+                  onChange={e => setFormData({ ...formData, mensagemPrincipal: e.target.value, contexto: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="group">
+                  <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2">Objetivo</label>
+                  <select 
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 transition-all text-xs appearance-none"
+                    value={formData.objetivo}
+                    onChange={e => setFormData({ ...formData, objetivo: e.target.value })}
+                  >
+                    <option value="Fixar Marca" className="bg-[var(--bg-app)]">Fixar Marca</option>
+                    <option value="Vender" className="bg-[var(--bg-app)]">Vender</option>
+                    <option value="Promoção" className="bg-[var(--bg-app)]">Promoção</option>
+                    <option value="Campanha Política" className="bg-[var(--bg-app)]">Política</option>
+                  </select>
+                </div>
+                <div className="group">
+                  <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2">Público</label>
+                  <select 
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 transition-all text-xs appearance-none"
+                    value={formData.publicoAlvo}
+                    onChange={e => setFormData({ ...formData, publicoAlvo: e.target.value })}
+                  >
+                    <option value="Popular" className="bg-[var(--bg-app)]">Popular</option>
+                    <option value="Jovem" className="bg-[var(--bg-app)]">Jovem</option>
+                    <option value="Família" className="bg-[var(--bg-app)]">Família</option>
+                    <option value="Premium" className="bg-[var(--bg-app)]">Premium</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="space-y-4">
           <div className="group">
@@ -189,20 +273,44 @@ export default function LyricsForm({ formData, setFormData, onSubmit, isLoading 
             </select>
           </div>
 
-          <div className="group">
-            <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
-              Emoção / Vibe
-            </label>
-            <select
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 transition-all text-sm appearance-none"
-              value={formData.emocao}
-              onChange={e => setFormData({ ...formData, emocao: e.target.value })}
-            >
-              {EMOTIONS.map(emotion => (
-                <option key={emotion} value={emotion} className="bg-[var(--bg-app)] text-[var(--text-main)]">{emotion}</option>
-              ))}
-            </select>
-          </div>
+          {formData.mode === 'Música' ? (
+            <div className="group">
+              <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
+                Emoção / Vibe
+              </label>
+              <select
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-primary/50 transition-all text-sm appearance-none"
+                value={formData.emocao}
+                onChange={e => setFormData({ ...formData, emocao: e.target.value })}
+              >
+                {EMOTIONS.map(emotion => (
+                  <option key={emotion} value={emotion} className="bg-[var(--bg-app)] text-[var(--text-main)]">{emotion}</option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="group">
+              <label className="block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 group-focus-within:text-brand-primary transition-colors">
+                Duração Estimada
+              </label>
+              <div className="flex gap-2">
+                {['5s', '15s', '30s', '60s'].map(d => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, duracaoEstimada: d })}
+                    className={`flex-1 py-2 rounded-lg border text-[10px] font-bold transition-all ${
+                      formData.duracaoEstimada === d 
+                        ? 'bg-brand-primary/20 border-brand-primary text-brand-primary' 
+                        : 'bg-white/5 border-white/10 text-[var(--text-muted)]'
+                    }`}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Upload de Áudio Instrumental */}
@@ -275,8 +383,7 @@ export default function LyricsForm({ formData, setFormData, onSubmit, isLoading 
             </div>
           )}
         </div>
-      </div>
-    </form>
+      </form>
   );
 }
 
@@ -408,20 +515,38 @@ LyricsForm.Advanced = function({ formData, setFormData, onSubmit, isLoading }: {
             <label className="block text-[10px] font-black uppercase tracking-[0.2em]">Escalabilidade Artística</label>
           </div>
           <div className="space-y-4 px-2">
-            <div className="space-y-2">
-              <div className="flex justify-between text-[9px] font-mono uppercase text-[var(--text-muted)]">
-                <span>Mais Comercial</span>
-                <span>Mais Poético</span>
+            {formData.mode === 'Música' ? (
+              <>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[9px] font-mono uppercase text-[var(--text-muted)]">
+                    <span>Mais Comercial</span>
+                    <span>Mais Poético</span>
+                  </div>
+                  <input type="range" className="w-full accent-brand-primary h-1.5 bg-black/20 rounded-lg appearance-none" value={formData.tomPoetico} onChange={e => setFormData({ ...formData, tomPoetico: parseInt(e.target.value) })} />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[9px] font-mono uppercase text-[var(--text-muted)]">
+                    <span>Mais Simples</span>
+                    <span>Mais Complexo</span>
+                  </div>
+                  <input type="range" className="w-full accent-brand-primary h-1.5 bg-black/20 rounded-lg appearance-none" value={formData.complexidade} onChange={e => setFormData({ ...formData, complexidade: parseInt(e.target.value) })} />
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex justify-between text-[9px] font-mono uppercase text-[var(--text-muted)]">
+                  <span>Normal</span>
+                  <span className="text-brand-primary font-bold">Modo Chiclete 🔥</span>
+                </div>
+                <input 
+                  type="range" 
+                  className="w-full accent-brand-primary h-1.5 bg-black/20 rounded-lg appearance-none" 
+                  value={formData.nivelRepeticao} 
+                  onChange={e => setFormData({ ...formData, nivelRepeticao: parseInt(e.target.value) })} 
+                />
+                <p className="text-[8px] text-center text-[var(--text-muted)] italic">Aumenta a repetição da marca e simplicidade das rimas</p>
               </div>
-              <input type="range" className="w-full accent-brand-primary h-1.5 bg-black/20 rounded-lg appearance-none" value={formData.tomPoetico} onChange={e => setFormData({ ...formData, tomPoetico: parseInt(e.target.value) })} />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-[9px] font-mono uppercase text-[var(--text-muted)]">
-                <span>Mais Simples</span>
-                <span>Mais Complexo</span>
-              </div>
-              <input type="range" className="w-full accent-brand-primary h-1.5 bg-black/20 rounded-lg appearance-none" value={formData.complexidade} onChange={e => setFormData({ ...formData, complexidade: parseInt(e.target.value) })} />
-            </div>
+            )}
           </div>
         </div>
 
@@ -469,7 +594,7 @@ LyricsForm.Advanced = function({ formData, setFormData, onSubmit, isLoading }: {
       <button
         form="lyrics-composition-form"
         type="submit"
-        disabled={isLoading || !formData.tema || !formData.estilo || (formData.estrutura.length === 0 && !formData.audioData)}
+        disabled={isLoading || (formData.mode === 'Música' ? (!formData.tema || !formData.estilo) : (!formData.marca || !formData.estilo)) || (formData.mode === 'Música' && formData.estrutura.length === 0 && !formData.audioData)}
         className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3 active:scale-[0.98] mt-2"
       >
         {isLoading ? (

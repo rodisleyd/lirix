@@ -15,7 +15,10 @@ export interface SectionConfig {
 
 export type SongStructure = SectionConfig[];
 
+export type CompositionMode = 'Música' | 'Jingle';
+
 export interface LyricRequest {
+  mode: CompositionMode;
   tema: string;
   contexto: string;
   referenciaCompositor: string;
@@ -32,6 +35,14 @@ export interface LyricRequest {
   complexidade: number; // 0 (simples) a 100 (complexo)
   tomPoetico: number; // 0 (comercial) a 100 (poético)
   modoCantor: boolean;
+  
+  // Campos específicos para Jingle
+  marca?: string;
+  mensagemPrincipal?: string;
+  objetivo?: string;
+  publicoAlvo?: string;
+  nivelRepeticao?: number;
+  duracaoEstimada?: string;
 }
 
 export interface LyricResult {
