@@ -122,9 +122,16 @@ export default function LyricsDisplay({ result, onReset }: Props) {
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="h-[1px] flex-1 bg-white/10"></div>
-              <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-500 font-bold">
-                {section.type}
-              </span>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-500 font-bold">
+                  {section.type}
+                </span>
+                {section.content[0]?.startsWith('[') && (
+                  <span className="text-[8px] font-mono text-brand-primary bg-brand-primary/10 px-1.5 py-0.5 rounded border border-brand-primary/20">
+                    {section.content[0].match(/^\[\d{2}:\d{2}\]/)?.[0]}
+                  </span>
+                )}
+              </div>
               <div className="h-[1px] flex-1 bg-white/10"></div>
             </div>
             

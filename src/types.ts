@@ -25,6 +25,13 @@ export interface LyricRequest {
   rima: RhymeScheme;
   palavrasObrigatorias: string;
   palavrasProibidas: string;
+  audioData?: {
+    base64: string;
+    mimeType: string;
+  };
+  complexidade: number; // 0 (simples) a 100 (complexo)
+  tomPoetico: number; // 0 (comercial) a 100 (poético)
+  modoCantor: boolean;
 }
 
 export interface LyricResult {

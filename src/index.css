@@ -78,3 +78,21 @@ select {
   padding-right: 2.5rem;
   -webkit-print-color-adjust: exact;
 }
+
+/* Audio Player Customization */
+audio::-webkit-media-controls-panel {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-mute-button {
+  background-color: var(--color-brand-primary) !important;
+  border-radius: 50%;
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}

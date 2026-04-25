@@ -53,7 +53,10 @@ export default function App() {
     ],
     rima: 'ABAB',
     palavrasObrigatorias: '',
-    palavrasProibidas: ''
+    palavrasProibidas: '',
+    complexidade: 50,
+    tomPoetico: 50,
+    modoCantor: false
   });
 
   React.useEffect(() => {

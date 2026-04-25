@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mic2, Sparkles, ChevronDown, GripVertical, Trash2, Copy, Plus } from 'lucide-react';
+import { Mic2, Sparkles, ChevronDown, GripVertical, Trash2, Copy, Plus, Upload, Music, X, Sliders, Settings2, Zap } from 'lucide-react';
 import { 
   DndContext, 
   closestCenter,
@@ -204,6 +204,77 @@ export default function LyricsForm({ formData, setFormData, onSubmit, isLoading 
             </select>
           </div>
         </div>
+
+        {/* Upload de Áudio Instrumental */}
+        <div className="pt-4 border-t border-white/5">
+          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary mb-4">
+            Modo Instrumental (Opcional)
+          </label>
+          
+          {!formData.audioData ? (
+            <div 
+              className="relative group/upload cursor-pointer"
+              onClick={() => document.getElementById('audio-upload')?.click()}
+            >
+              <div className="flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-white/10 bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 transition-all">
+                <div className="p-3 rounded-full bg-brand-primary/10 text-brand-primary mb-3 group-hover/upload:scale-110 transition-transform">
+                  <Upload className="w-6 h-6" />
+                </div>
+                <span className="text-xs font-bold text-[var(--text-main)] mb-1">Subir Instrumental</span>
+                <span className="text-[10px] text-[var(--text-muted)]">MP3 ou WAV (Máx 10MB)</span>
+              </div>
+              <input 
+                id="audio-upload"
+                type="file" 
+                accept="audio/mp3,audio/wav,audio/mpeg"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size > 10 * 1024 * 1024) {
+                      alert("Arquivo muito grande. O limite é 10MB.");
+                      return;
+                    }
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const base64 = (reader.result as string).split(',')[1];
+                      setFormData({ 
+                        ...formData, 
+                        audioData: { base64, mimeType: file.type } 
+                      });
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </div>
+          ) : (
+            <div className="p-4 rounded-2xl bg-brand-primary/10 border border-brand-primary/20 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-brand-primary text-white">
+                    <Music className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold text-brand-primary uppercase tracking-wider">Áudio Carregado</div>
+                    <div className="text-[9px] text-[var(--text-muted)]">A IA analisará o ritmo e a vibe</div>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setFormData({ ...formData, audioData: undefined })}
+                  className="p-1.5 hover:bg-red-500/20 hover:text-red-500 text-[var(--text-muted)] rounded-lg transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <audio 
+                controls 
+                className="w-full h-8 accent-brand-primary"
+                src={`data:${formData.audioData.mimeType};base64,${formData.audioData.base64}`}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </form>
   );
@@ -273,13 +344,20 @@ LyricsForm.Advanced = function({ formData, setFormData, onSubmit, isLoading }: {
 
   return (
     <div className="space-y-6">
+      {/* Seção 1: Estrutura */}
       <div className="space-y-4">
-        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary">
-          Estrutura da Música
-        </label>
+        <div className="flex items-center justify-between">
+          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary">
+            Estrutura da Música
+          </label>
+          {formData.audioData && (
+            <span className="text-[9px] font-bold text-brand-primary bg-brand-primary/10 px-2 py-1 rounded-full border border-brand-primary/20 animate-pulse">
+              AUTO-DETECT ATIVO
+            </span>
+          )}
+        </div>
         
-        {/* Botões para Adicionar Seção */}
-        <div className="flex flex-wrap gap-2">
+        <div className={`flex flex-wrap gap-2 transition-opacity duration-300 ${formData.audioData ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
           {(['Verso', 'Pré-Refrão', 'Refrão', 'Ponte', 'Outro'] as SectionType[]).map(type => (
             <button
               key={type}
@@ -293,41 +371,81 @@ LyricsForm.Advanced = function({ formData, setFormData, onSubmit, isLoading }: {
           ))}
         </div>
 
-        {/* Lista Arrastável */}
-        <div className="max-h-[500px] overflow-y-auto pr-1 custom-scrollbar space-y-3">
-          <DndContext 
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext 
-              items={formData.estrutura.map(s => s.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {formData.estrutura.map((section) => (
-                <SortableSectionItem 
-                  key={section.id} 
-                  section={section} 
-                  onRemove={removeSection}
-                  onDuplicate={duplicateSection}
-                  onUpdateLines={updateSectionLines}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+        <div className="max-h-[400px] overflow-y-auto pr-1 custom-scrollbar space-y-3">
+          {formData.audioData ? (
+            <div className="p-8 rounded-2xl border-2 border-dashed border-brand-primary/20 bg-brand-primary/5 flex flex-col items-center justify-center text-center space-y-3">
+              <Sparkles className="w-8 h-8 text-brand-primary animate-pulse" />
+              <div className="space-y-1">
+                <p className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider">Estrutura Inteligente</p>
+                <p className="text-[10px] text-[var(--text-muted)] leading-relaxed">
+                  O Lirix analisará o áudio para definir automaticamente versos e refrões sincronizados.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={formData.estrutura.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                {formData.estrutura.map((section) => (
+                  <SortableSectionItem 
+                    key={section.id} 
+                    section={section} 
+                    onRemove={removeSection}
+                    onDuplicate={duplicateSection}
+                    onUpdateLines={updateSectionLines}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
         </div>
       </div>
 
-      <div className="border-t border-[var(--glass-border)] pt-6 space-y-5">
-        <div className="group">
-          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] mb-3">
-            Tipo de Rima
-          </label>
-          <select
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:border-brand-primary/50 text-sm appearance-none"
-            value={formData.rima}
-            onChange={e => setFormData({ ...formData, rima: e.target.value as RhymeScheme })}
+      {/* Seção 2: Ajustes Premium e Opções */}
+      <div className="border-t border-[var(--glass-border)] pt-6 space-y-6">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-brand-primary">
+            <Settings2 className="w-4 h-4" />
+            <label className="block text-[10px] font-black uppercase tracking-[0.2em]">Escalabilidade Artística</label>
+          </div>
+          <div className="space-y-4 px-2">
+            <div className="space-y-2">
+              <div className="flex justify-between text-[9px] font-mono uppercase text-[var(--text-muted)]">
+                <span>Mais Comercial</span>
+                <span>Mais Poético</span>
+              </div>
+              <input type="range" className="w-full accent-brand-primary h-1.5 bg-black/20 rounded-lg appearance-none" value={formData.tomPoetico} onChange={e => setFormData({ ...formData, tomPoetico: parseInt(e.target.value) })} />
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-[9px] font-mono uppercase text-[var(--text-muted)]">
+                <span>Mais Simples</span>
+                <span>Mais Complexo</span>
+              </div>
+              <input type="range" className="w-full accent-brand-primary h-1.5 bg-black/20 rounded-lg appearance-none" value={formData.complexidade} onChange={e => setFormData({ ...formData, complexidade: parseInt(e.target.value) })} />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary">Modo Performance</label>
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, modoCantor: !formData.modoCantor })}
+            className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${formData.modoCantor ? 'bg-brand-primary/10 border-brand-primary text-brand-primary' : 'bg-white/5 border-white/10 text-[var(--text-muted)]'}`}
           >
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${formData.modoCantor ? 'bg-brand-primary text-white' : 'bg-white/5'}`}><Mic2 className="w-4 h-4" /></div>
+              <div className="text-left">
+                <div className="text-[10px] font-bold uppercase tracking-wider">Modo Cantor</div>
+                <div className="text-[8px] opacity-70">Pausas, Respiração e Sílabas</div>
+              </div>
+            </div>
+            {formData.modoCantor && <Zap className="w-4 h-4 fill-current animate-pulse" />}
+          </button>
+        </div>
+
+        <div className="group">
+          <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] mb-3">Tipo de Rima</label>
+          <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 focus:outline-none text-sm appearance-none" value={formData.rima} onChange={e => setFormData({ ...formData, rima: e.target.value as RhymeScheme })}>
             <option value="ABAB" className="bg-zinc-900">ABAB (Cruzada)</option>
             <option value="AABB" className="bg-zinc-900">AABB (Emparelhada)</option>
             <option value="Livre" className="bg-zinc-900">Livre</option>
@@ -337,45 +455,27 @@ LyricsForm.Advanced = function({ formData, setFormData, onSubmit, isLoading }: {
 
         <div className="space-y-4">
           <div className="group">
-            <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">
-              Palavras Obrigatórias
-            </label>
-            <input
-              type="text"
-              placeholder="Separadas por vírgula..."
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:border-brand-primary/50 text-sm"
-              value={formData.palavrasObrigatorias}
-              onChange={e => setFormData({ ...formData, palavrasObrigatorias: e.target.value })}
-            />
+            <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Palavras Obrigatórias</label>
+            <input type="text" placeholder="Separadas por vírgula..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm" value={formData.palavrasObrigatorias} onChange={e => setFormData({ ...formData, palavrasObrigatorias: e.target.value })} />
           </div>
           <div className="group">
-            <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">
-              Evitar Palavras
-            </label>
-            <input
-              type="text"
-              placeholder="Termos indesejados..."
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:border-brand-primary/50 text-sm"
-              value={formData.palavrasProibidas}
-              onChange={e => setFormData({ ...formData, palavrasProibidas: e.target.value })}
-            />
+            <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Evitar Palavras</label>
+            <input type="text" placeholder="Termos indesejados..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm" value={formData.palavrasProibidas} onChange={e => setFormData({ ...formData, palavrasProibidas: e.target.value })} />
           </div>
         </div>
       </div>
 
+      {/* Botão Principal */}
       <button
         form="lyrics-composition-form"
         type="submit"
-        disabled={isLoading || !formData.tema || !formData.estilo || formData.estrutura.length === 0}
-        className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-primary/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98] mt-2"
+        disabled={isLoading || !formData.tema || !formData.estilo || (formData.estrutura.length === 0 && !formData.audioData)}
+        className="w-full bg-brand-primary hover:bg-brand-primary/90 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3 active:scale-[0.98] mt-2"
       >
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          <>
-            <Sparkles className="w-5 h-5" />
-            COMPOR AGORA
-          </>
+          <><Sparkles className="w-5 h-5" />COMPOR AGORA</>
         )}
       </button>
     </div>

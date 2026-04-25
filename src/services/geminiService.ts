@@ -28,14 +28,31 @@ ${contexto ? `- Contexto Adicional: ${contexto}` : ""}
 ${referenciaCompositor ? `- Estilo de Escrita/Referência: Inspirado em ${referenciaCompositor}` : ""}
 - Estilo Musical: ${estilo}
 - Emoção/Vibe: ${emocao}
-- Estrutura e métrica detalhada (ORDEM OBRIGATÓRIA): ${descritivoEstrutura}
+- Tom da Escrita: ${request.tomPoetico > 70 ? 'Altamente Poético e Metafórico' : request.tomPoetico < 30 ? 'Direto, Comercial e Chiclete' : 'Equilibrado'}
+- Nível de Vocabulário: ${request.complexidade > 70 ? 'Rico, Erudito e Complexo' : request.complexidade < 30 ? 'Simples, Coloquial e Acessível' : 'Médio'}
+${request.modoCantor ? `
+- RECURSOS DE PERFORMANCE (ATIVO): 
+  1. Inclua marcações de (pausa) e [respiração] onde for natural cantar.
+  2. Faça a divisão silábica (ex: "mú-si-ca") em palavras que exijam uma articulação rítmica específica.
+  3. Adicione timestamps sugeridos no início de cada seção, ex: [00:00], baseados no andamento da música.
+` : ""}
+${request.audioData ? `- Estrutura: [IGNORE A ESTRUTURA MANUAL ABAIXO E CRIE UMA BASEADA NO ÁUDIO]` : `- Estrutura e métrica detalhada (ORDEM OBRIGATÓRIA): ${descritivoEstrutura}`}
 - Esquema de rimas: ${rima === 'Sem Rima' ? 'Versos Brancos (Sem rimas obrigatórias, foco total na métrica, cadência e encaixe poético das palavras)' : rima}
 ${palavrasObrigatorias ? `- Palavras OBRIGATÓRIAS a incluir: ${palavrasObrigatorias}` : ""}
 ${palavrasProibidas ? `- Palavras PROIBIDAS (NÃO use de jeito nenhum): ${palavrasProibidas}` : ""}
 
+${request.audioData ? `
+ATENÇÃO - MODO INSTRUMENTAL ATIVO: 
+1. Analise o arquivo de áudio fornecido.
+2. Identifique a estrutura real da música (Intro, Versos, Refrão, Ponte, Solo, Outro).
+3. Determine a quantidade exata de linhas para cada seção baseando-se no tempo disponível no instrumental.
+4. Escreva a letra respeitando as pausas e as explosões rítmicas do áudio.
+5. Se o áudio tiver uma parte de solo ou instrumental longo, indique como {Solo Instrumental} ou similar.
+` : `
 Orientações de métrica e estilo: 
 1. Respeite rigorosamente a quantidade de linhas solicitada para cada seção.
 2. Siga exatamente a ordem das seções definida acima.
+`}
 3. Adapte o vocabulário, as gírias, a cadência e as figuras de linguagem especificamente para o gênero "${estilo}".
 ${rima === 'Sem Rima' ? '4. PRIORIDADE: Como solicitado "Sem Rima", não force rimas fonéticas. Foque no ritmo interno das frases, como nas letras de Djavan ou Legião Urbana, onde a sonoridade vem do encaixe das frases e não do final das palavras.' : ""}
 ${referenciaCompositor ? `${rima === 'Sem Rima' ? '5' : '4'}. Além do gênero, procure captar a essência lírica e a profundidade poética de ${referenciaCompositor}.` : ""}
@@ -52,9 +69,31 @@ Formate a resposta estritamente como um objeto JSON válido com a seguinte estru
 Importante: Retorne APENAS o JSON, sem markdown ou explicações.`;
 
   try {
+    const contents = request.audioData 
+      ? [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType: request.audioData.mimeType,
+                  data: request.audioData.base64
+                }
+              }
+            ]
+          }
+        ]
+      : [
+          {
+            role: "user",
+            parts: [{ text: prompt }]
+          }
+        ];
+
     const response = await ai.models.generateContent({
       model: "gemini-3.1-pro-preview",
-      contents: prompt,
+      contents,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
